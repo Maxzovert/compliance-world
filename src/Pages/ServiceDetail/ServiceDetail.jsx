@@ -9,6 +9,48 @@ import { serviceCategories } from '../../data/servicesData'
 import { extractTocFromBlocks, parseFormattedBlocks } from '../../utils/formatServiceContent'
 import { getServiceDetailPath, resolveServiceFromSlugs } from '../../utils/serviceSlug'
 
+const serviceFaqGroupName = (service) =>
+  `cw-faq-${service.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '') || 'service'}`
+
+const ServiceFaqAccordion = ({ items, service }) => {
+  if (!items?.length) return null
+
+  const groupName = serviceFaqGroupName(service)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: 0.12 }}
+      id="service-faq"
+      className="rounded-2xl border border-white/12 bg-linear-to-b from-white/7 to-white/4 p-6 shadow-2xl shadow-black/25 backdrop-blur-sm sm:p-8 lg:p-10"
+    >
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">FAQ</p>
+      <h2 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">Frequently asked questions</h2>
+      <p className="mt-2 text-sm text-blue-100/80">Expand a question to read the full answer.</p>
+      <div className="mt-6 space-y-2">
+        {items.map((item, index) => (
+          <details
+            key={`${item.question.slice(0, 56)}-${index}`}
+            name={groupName}
+            className="group overflow-hidden rounded-xl border border-white/12 bg-white/4 transition-colors hover:border-cyan-300/30 open:border-cyan-300/40 open:bg-white/6"
+          >
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 text-left text-sm font-medium text-white sm:text-base [&::-webkit-details-marker]:hidden">
+              <span className="min-w-0 flex-1 pr-2 leading-snug">{item.question}</span>
+              <span className="shrink-0 text-xs font-semibold text-cyan-300 transition-transform duration-200 group-open:rotate-180">
+                ▼
+              </span>
+            </summary>
+            <div className="border-t border-white/10 px-4 pb-4">
+              <p className="pt-4 text-sm leading-relaxed text-blue-100/90 sm:text-base">{item.answer}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
 const FormattedBody = ({ blocks }) => {
   if (!blocks.length) {
     return (
@@ -220,7 +262,7 @@ const ServiceDetail = () => {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.08 }}
-              className="order-1 min-w-0 flex-1"
+              className="order-1 flex min-w-0 flex-1 flex-col gap-8 lg:gap-10"
             >
               <div className="rounded-2xl border border-white/12 bg-linear-to-b from-white/7 to-white/4 p-6 shadow-2xl shadow-black/25 backdrop-blur-sm sm:p-8 lg:p-10">
                 <h2 className="text-3xl font-bold tracking-tight text-white">{service}</h2>
@@ -236,8 +278,8 @@ const ServiceDetail = () => {
                     Continue to Order
                   </NavLink>
                 </div>
-
               </div>
+              <ServiceFaqAccordion items={content?.faqItems} service={service} />
             </motion.article>
 
             <aside className="order-2 lg:sticky lg:top-28 lg:w-72 lg:shrink-0 lg:self-start">
