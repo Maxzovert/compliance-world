@@ -7,6 +7,10 @@ import Order from './Pages/Order/Order'
 import ServiceDetail from './Pages/ServiceDetail/ServiceDetail'
 import Login from './Pages/Auth/Login'
 import Signup from './Pages/Auth/Signup'
+import PrivacyPolicy from './Pages/Legal/PrivacyPolicy'
+import RefundPolicy from './Pages/Legal/RefundPolicy'
+import TermsAndConditions from './Pages/Legal/TermsAndConditions'
+import Disclaimer from './Pages/Legal/Disclaimer'
 
 const App = () => {
   const location = useLocation()
@@ -24,6 +28,10 @@ const App = () => {
         <Route path="/order" element={<Order />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="/disclaimer" element={<Disclaimer />} />
       </Routes>
 
       {background ? (
