@@ -145,14 +145,6 @@ const Navbar = () => {
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className={toggleBtnClass}
-            aria-label={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
-          >
-            {isLight ? <MoonIcon /> : <SunIcon />}
-          </button>
           {authLoading ? (
             <span
               className={`rounded-xl px-3 py-2 text-xs font-medium sm:text-sm ${isLight ? 'text-slate-500' : 'text-slate-500'}`}
@@ -174,6 +166,14 @@ const Navbar = () => {
               Log in
             </NavLink>
           )}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className={toggleBtnClass}
+            aria-label={isLight ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {isLight ? <MoonIcon /> : <SunIcon />}
+          </button>
         </div>
       </nav>
     </header>
