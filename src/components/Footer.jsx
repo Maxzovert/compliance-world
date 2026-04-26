@@ -1,10 +1,35 @@
+import { NavLink } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 
-const footerLinks = {
-  Services: ['Company Registration', 'GST Filing', 'Income Tax', 'Trademark Registration'],
-  Company: ['About Us', 'Careers', 'Blog', 'Contact'],
-  Legal: ['Privacy Policy', 'Terms & Conditions', 'Refund Policy', 'Disclaimer'],
-}
+const footerColumns = [
+  {
+    title: 'Services',
+    links: [
+      { label: 'Company Registration', to: '/services' },
+      { label: 'GST Filing', to: '/services' },
+      { label: 'Income Tax', to: '/services' },
+      { label: 'Trademark Registration', to: '/services' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About Us', to: '/about-us' },
+      { label: 'Careers', to: '#' },
+      { label: 'Blog', to: '#' },
+      { label: 'Contact', to: '/contact-us' },
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      { label: 'Privacy Policy', to: '/privacy-policy' },
+      { label: 'Terms & Conditions', to: '/terms-and-conditions' },
+      { label: 'Refund Policy', to: '/refund-policy' },
+      { label: 'Disclaimer', to: '/disclaimer' },
+    ],
+  },
+]
 
 const Footer = () => {
   const { isLight } = useTheme()
@@ -29,6 +54,8 @@ const Footer = () => {
   const bottomBorder = isLight ? 'border-slate-200' : 'border-slate-700'
   const bottomText = isLight ? 'text-slate-600' : 'text-slate-400'
 
+  const linkItemClass = `${linkClass} block ${isLight ? linkHover : linkHoverDark}`
+
   return (
     <footer id="contact" className={footerClass}>
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-5 lg:px-8">
@@ -44,13 +71,21 @@ const Footer = () => {
           </div>
         </div>
 
-        {Object.entries(footerLinks).map(([title, links]) => (
-          <div key={title}>
-            <p className={colTitleClass}>{title}</p>
-            <ul className={`mt-4 space-y-2 ${linkClass}`}>
-              {links.map((link) => (
-                <li key={link} className={isLight ? linkHover : linkHoverDark}>
-                  <a href="/">{link}</a>
+        {footerColumns.map((column) => (
+          <div key={column.title}>
+            <p className={colTitleClass}>{column.title}</p>
+            <ul className="mt-4 space-y-2">
+              {column.links.map((item) => (
+                <li key={item.label}>
+                  {item.to.startsWith('/') ? (
+                    <NavLink to={item.to} className={linkItemClass}>
+                      {item.label}
+                    </NavLink>
+                  ) : (
+                    <a href={item.to} className={linkItemClass}>
+                      {item.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
