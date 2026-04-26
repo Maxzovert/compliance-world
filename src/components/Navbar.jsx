@@ -155,7 +155,7 @@ const Navbar = () => {
           ) : user ? (
             <div className="flex max-w-[min(100%,280px)] items-center gap-2 sm:gap-3">
               <span className={userLabelClass} title={user.email ?? ''}>
-                {user.displayName || user.email?.split('@')[0] || 'Account'}
+                {user.name || user.displayName || user.email?.split('@')[0] || 'Account'}
               </span>
               <button type="button" onClick={() => signOut()} className={signOutClass}>
                 Sign out

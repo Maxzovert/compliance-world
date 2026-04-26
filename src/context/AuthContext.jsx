@@ -1,66 +1,70 @@
 /* eslint-disable react-refresh/only-export-components -- AuthProvider + useAuth */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut as firebaseSignOut,
-  updateProfile,
-} from 'firebase/auth'
+import { signInWithPopup } from 'firebase/auth'
+import { firebaseLogin, getMe, login, logout, signup } from '../lib/authApi'
 import { auth, googleProvider, isFirebaseConfigured } from '../lib/firebase'
 
 const AuthContext = createContext(null)
 
-function assertAuth() {
-  if (!auth || !googleProvider) {
-    const err = new Error('Firebase is not configured.')
-    err.code = 'app/firebase-not-configured'
-    throw err
-  }
-}
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(() => Boolean(auth))
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!auth) {
-      return undefined
+    let mounted = true
+    getMe()
+      .then((data) => {
+        if (!mounted) return
+        setUser(data?.user ?? null)
+      })
+      .catch(() => {
+        if (!mounted) return
+        setUser(null)
+      })
+      .finally(() => {
+        if (!mounted) return
+        setLoading(false)
+      })
+    return () => {
+      mounted = false
     }
-    return onAuthStateChanged(auth, (nextUser) => {
-      setUser(nextUser)
-      setLoading(false)
-    })
   }, [])
 
   const signInWithEmail = useCallback(async (email, password) => {
-    assertAuth()
-    await signInWithEmailAndPassword(auth, email, password)
+    const data = await login({ email, password })
+    setUser(data?.user ?? null)
   }, [])
 
   const signUpWithEmail = useCallback(async (email, password, displayName) => {
-    assertAuth()
-    const credential = await createUserWithEmailAndPassword(auth, email, password)
-    if (displayName?.trim()) {
-      await updateProfile(credential.user, { displayName: displayName.trim() })
-    }
+    const data = await signup({
+      name: displayName?.trim() || email.split('@')[0] || 'User',
+      email,
+      password,
+    })
+    setUser(data?.user ?? null)
   }, [])
 
   const signInWithGoogle = useCallback(async () => {
-    assertAuth()
-    await signInWithPopup(auth, googleProvider)
+    if (!auth || !googleProvider) {
+      const err = new Error('Firebase client is not configured.')
+      err.code = 'app/firebase-not-configured'
+      throw err
+    }
+    const credential = await signInWithPopup(auth, googleProvider)
+    const idToken = await credential.user.getIdToken()
+    const data = await firebaseLogin({ idToken })
+    setUser(data?.user ?? null)
   }, [])
 
   const signOut = useCallback(async () => {
-    if (!auth) return
-    await firebaseSignOut(auth)
+    await logout()
+    setUser(null)
   }, [])
 
-  const resetPassword = useCallback(async (email) => {
-    assertAuth()
-    await sendPasswordResetEmail(auth, email)
+  const resetPassword = useCallback(async () => {
+    const err = new Error('Password reset endpoint is not set up yet.')
+    err.code = 'auth/operation-not-allowed'
+    throw err
   }, [])
 
   const value = useMemo(

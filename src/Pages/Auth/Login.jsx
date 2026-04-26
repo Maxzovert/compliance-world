@@ -16,8 +16,6 @@ const LoginForm = ({
   form,
   handleChange,
   handleSubmit,
-  handleForgotPassword,
-  forgotClassName,
   error,
   info,
   busy,
@@ -73,16 +71,6 @@ const LoginForm = ({
           disabled={busy}
         />
       </div>
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={handleForgotPassword}
-          className={forgotClassName}
-          disabled={busy || !isFirebaseConfigured}
-        >
-          Forgot password?
-        </button>
-      </div>
       <p className="text-xs leading-relaxed text-slate-500">
         By signing in you agree to our{' '}
         <a href="/" className="text-cyan-300/90 underline-offset-2 hover:underline">
@@ -124,7 +112,7 @@ const Login = () => {
   const background = location.state?.background
   const isModal = Boolean(background)
 
-  const { signInWithEmail, signInWithGoogle, resetPassword, isFirebaseConfigured: firebaseReady } = useAuth()
+  const { signInWithEmail, signInWithGoogle, isFirebaseConfigured: firebaseReady } = useAuth()
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
@@ -155,25 +143,6 @@ const Login = () => {
     try {
       await signInWithEmail(form.email.trim(), form.password)
       finishSuccess()
-    } catch (err) {
-      setError(formatAuthError(err?.code))
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const handleForgotPassword = async () => {
-    setError('')
-    setInfo('')
-    const email = form.email.trim()
-    if (!email) {
-      setError('Enter your email above, then click Forgot password again.')
-      return
-    }
-    setBusy(true)
-    try {
-      await resetPassword(email)
-      setInfo('Password reset email sent. Check your inbox.')
     } catch (err) {
       setError(formatAuthError(err?.code))
     } finally {
@@ -218,15 +187,10 @@ const Login = () => {
     }
   }, [isModal, closeModal])
 
-  const forgotClassName =
-    'text-xs font-medium text-cyan-300/90 underline-offset-2 transition hover:text-cyan-200 hover:underline disabled:opacity-50'
-
   const formProps = {
     form,
     handleChange,
     handleSubmit,
-    handleForgotPassword,
-    forgotClassName,
     error,
     info,
     busy,
@@ -278,11 +242,7 @@ const Login = () => {
           <LoginForm {...formProps} />
 
           <p className="mt-6 text-center text-sm text-slate-400">
-            <NavLink
-              to="/signup"
-              state={{ background }}
-              className="font-semibold text-cyan-300 transition hover:text-cyan-200"
-            >
+            <NavLink to="/signup" className="font-semibold text-cyan-300 transition hover:text-cyan-200">
               New here? Create an account
             </NavLink>
           </p>
